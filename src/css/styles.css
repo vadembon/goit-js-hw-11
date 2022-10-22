@@ -46,6 +46,8 @@ img {
   justify-content: center;
 }
 .photo-card {
+  border: 1px solid #212121;
+  border-radius: 5px;
   width: 320px;
   margin-right: 10px;
   margin-bottom: 10px;
