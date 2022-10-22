@@ -17,7 +17,7 @@ let lightbox = new SimpleLightbox('.gallery__item', {
   captions: true,
   captionsData: 'alt',
   captionDelay: 250,
-}).refresh();
+});
 
 let page = 1;
 loadMore.setAttribute('hidden', true);
@@ -45,21 +45,25 @@ async function getImgGallery() {
       Notiflix.Notify.info(
         `Hooray! We found ${response.data.totalHits} images.`
       );
+      lightbox.refresh();
     }
     if (dataImg.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
       loadMore.setAttribute('hidden', true);
+      lightbox.refresh();
     }
     if (dataImg.length >= 40) {
       loadMore.removeAttribute('hidden');
     } else if (dataImg.length) {
       loadMore.setAttribute('hidden', true);
+      // lightbox.refresh();
     }
     if (searchQuery.length === 0) {
       gallery.innerHTML = '';
       loadMore.setAttribute('hidden', true);
+      // lightbox.refresh();
     }
 
     console.log(response.data);
