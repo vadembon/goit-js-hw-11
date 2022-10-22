@@ -10,7 +10,7 @@ const loadMore = document.querySelector('.load-more');
 form.addEventListener('submit', onBtnSubmitImg);
 loadMore.addEventListener('click', onLoad);
 
-const BASE_URL = 'https://pixabay.com/api/?';
+const BASE_URL = 'https://pixabay.com/api/';
 const KEY_API = '30686791-b3479a34cf20c1ed10f00ae7f';
 
 let lightbox = new SimpleLightbox('.gallery__item', {
@@ -35,7 +35,7 @@ async function getImgGallery() {
   });
 
   try {
-    const response = await axios.get(`${BASE_URL}${searchParams}`);
+    const response = await axios.get(`${BASE_URL}?${searchParams}`);
     const dataImg = response.data.hits;
 
     gallery.insertAdjacentHTML('beforeend', createMarkup(dataImg));
@@ -76,8 +76,6 @@ function onBtnSubmitImg(evt) {
   if (searchQuery) {
     gallery.innerHTML = '';
     page = 1;
-  } else {
-    getImgGallery(searchQuery);
   }
 
   if (searchQuery === '') {
