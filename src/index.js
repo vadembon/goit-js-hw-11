@@ -13,7 +13,7 @@ loadMore.addEventListener('click', onLoad);
 const BASE_URL = 'https://pixabay.com/api/?';
 const KEY_API = '30686791-b3479a34cf20c1ed10f00ae7f';
 
-new SimpleLightbox('.gallery__item', {
+let lightbox = new SimpleLightbox('.gallery__item', {
   captions: true,
   captionsData: 'alt',
   captionDelay: 250,
