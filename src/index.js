@@ -39,7 +39,7 @@ async function getImgGallery() {
     const dataImg = response.data.hits;
 
     gallery.insertAdjacentHTML('beforeend', createMarkup(dataImg));
-
+    lightbox.refresh();
     console.log(page);
     if (dataImg.length > 1 && page === 1) {
       Notiflix.Notify.info(
@@ -58,12 +58,10 @@ async function getImgGallery() {
       loadMore.removeAttribute('hidden');
     } else if (dataImg.length) {
       loadMore.setAttribute('hidden', true);
-      // lightbox.refresh();
     }
     if (searchQuery.length === 0) {
       gallery.innerHTML = '';
       loadMore.setAttribute('hidden', true);
-      // lightbox.refresh();
     }
 
     console.log(response.data);
