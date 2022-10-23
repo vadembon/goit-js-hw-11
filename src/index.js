@@ -40,19 +40,17 @@ async function getImgGallery() {
 
     gallery.insertAdjacentHTML('beforeend', createMarkup(dataImg));
     lightbox.refresh();
-    console.log(page);
+
     if (dataImg.length > 1 && page === 1) {
       Notiflix.Notify.info(
         `Hooray! We found ${response.data.totalHits} images.`
       );
-      lightbox.refresh();
     }
     if (dataImg.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
       loadMore.setAttribute('hidden', true);
-      lightbox.refresh();
     }
     if (dataImg.length >= 40) {
       loadMore.removeAttribute('hidden');
@@ -63,8 +61,6 @@ async function getImgGallery() {
       gallery.innerHTML = '';
       loadMore.setAttribute('hidden', true);
     }
-
-    console.log(response.data);
   } catch (error) {
     console.error(error);
   }
@@ -72,9 +68,8 @@ async function getImgGallery() {
 
 function onBtnSubmitImg(evt) {
   evt.preventDefault();
-
   searchQuery = form.elements.searchQuery.value;
-  console.log(searchQuery.length);
+
   if (searchQuery) {
     gallery.innerHTML = '';
     page = 1;
