@@ -18,12 +18,12 @@ let lightbox = new SimpleLightbox('.gallery__item', {
   captionsData: 'alt',
   captionDelay: 250,
 });
-
-let page = 1;
-loadMore.setAttribute('hidden', true);
+let currentPage = 1;
+let currentHits = 0;
 let searchQuery = '';
+loadMore.setAttribute('hidden', true);
 
-async function getImgGallery() {
+async function getImgGallery(searchQuery, page) {
   const searchParams = new URLSearchParams({
     key: KEY_API,
     q: searchQuery,
@@ -33,65 +33,62 @@ async function getImgGallery() {
     page: page,
     per_page: 40,
   });
+  return await axios
+    .get(`${BASE_URL}?${searchParams}`)
+    .then(response => response.data);
+}
 
+async function onBtnSubmitImg(evt) {
+  evt.preventDefault();
+  searchQuery = form.elements.searchQuery.value.trim();
+  currentPage = 1;
+  if (searchQuery === '') {
+    return (
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      ),
+      scrrolUp()
+    );
+  }
+
+  const response = await getImgGallery(searchQuery, currentPage);
+
+  if (response.totalHits > 40) {
+    loadMore.removeAttribute('hidden');
+  } else {
+    loadMore.setAttribute('hidden', true);
+  }
   try {
-    const response = await axios.get(`${BASE_URL}?${searchParams}`);
-    const dataImg = response.data.hits;
-
-    gallery.insertAdjacentHTML('beforeend', createMarkup(dataImg));
-    lightbox.refresh();
-
-    if (dataImg.length > 1 && page === 1) {
-      Notiflix.Notify.info(
-        `Hooray! We found ${response.data.totalHits} images.`
-      );
+    if (response.hits.length > 0) {
+      Notiflix.Notify.info(`Hooray! We found ${response.totalHits} images.`);
+      gallery.innerHTML = createMarkup(response.hits);
+      lightbox.refresh();
+      scrrolUp();
     }
-    if (dataImg.length === 0) {
+
+    if (response.totalHits === 0) {
+      gallery.innerHTML = '';
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
-      loadMore.setAttribute('hidden', true);
     }
-    if (dataImg.length >= 40) {
-      loadMore.removeAttribute('hidden');
-    } else if (dataImg.length) {
-      loadMore.setAttribute('hidden', true);
-    }
-    if (searchQuery.length === 0) {
-      gallery.innerHTML = '';
-      loadMore.setAttribute('hidden', true);
-    }
+    form.reset();
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
-function onBtnSubmitImg(evt) {
-  evt.preventDefault();
-  searchQuery = form.elements.searchQuery.value;
+async function onLoad() {
+  currentPage += 1;
 
-  if (searchQuery) {
-    gallery.innerHTML = '';
-    page = 1;
-  }
+  const response = await getImgGallery(searchQuery, currentPage);
+  gallery.insertAdjacentHTML('beforeend', createMarkup(response.hits));
+  lightbox.refresh();
+  currentHits = 40 * currentPage;
 
-  if (searchQuery === '') {
-    gallery.innerHTML = '';
+  if (currentHits >= response.totalHits) {
     loadMore.setAttribute('hidden', true);
-    Notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
-  } else {
-    getImgGallery(searchQuery);
   }
-
-  form.reset();
-}
-
-function onLoad() {
-  page += 1;
-
-  getImgGallery(searchQuery);
 }
 
 function createMarkup(images) {
@@ -100,7 +97,7 @@ function createMarkup(images) {
       image =>
         `<div class="photo-card">
         <a class="gallery__item" href="${image.largeImageURL}">
-  <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" class="gallery__image" />
+  <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" class="gallery-image" />
    </a>
   <div class="info">
     <p class="info-item">
@@ -123,4 +120,22 @@ function createMarkup(images) {
 </div>`
     )
     .join('');
+}
+
+///..scroll up..///
+
+// const btnScrrol = document.querySelector('.up-btn');
+// btnScrrol.addEventListener('click', onScrrolUp);
+// function onScrrolUp(evt) {
+//   scrrolUp();
+// }
+function scrrolUp() {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * -1000,
+    behavior: 'smooth',
+  });
 }
